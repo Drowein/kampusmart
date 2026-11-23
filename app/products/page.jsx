@@ -91,7 +91,8 @@ export default function ProductsPage() {
             {products.map((product) => (
               <div
                 key={product.id}
-                className="overflow-hidden rounded-2xl border border-gray-200 bg-white transition hover:shadow-lg"
+                onClick={() => window.location.href = `/products/${product.id}`}
+                className="overflow-hidden rounded-2xl border border-gray-200 bg-white transition hover:shadow-lg cursor-pointer"
               >
                 {/* PRODUCT IMAGE */}
                 <div className="flex h-52 items-center justify-center bg-gray-100">
