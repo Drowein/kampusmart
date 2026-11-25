@@ -1,42 +1,62 @@
-
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-  async function handleLogin(e) {
-    e.preventDefault();
+    async function handleLogin(e) {
+        e.preventDefault();
 
     setMessage("");
     setLoading(true);
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            email,
+            password,
+            }),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (!response.ok) {
-        setMessage(result.message);
-        return;
-      }
+        if (!response.ok) {
+            setMessage(result.message);
+            return;
+        }
 
-      setMessage(
-        `Login berhasil! Selamat datang, ${result.data.name}. Role: ${result.data.role}`
-      );
+        const role = result.data.role;
+        const sellerStatus = result.data.seller_status;
+
+        let destination = "/";
+
+        if (role === "admin") {
+        destination = "/admin";
+        } else if (role === "buyer") {
+        destination = "/buyer";
+        } else if (role === "seller") {
+        if (sellerStatus === "approved") {
+            destination = "/seller";
+        } else if (sellerStatus === "pending") {
+            destination = "/seller-pending";
+        } else if (sellerStatus === "rejected") {
+            destination = "/seller-rejected";
+        }
+        }
+
+        router.replace(destination);
+        router.refresh();
+
     } catch (error) {
       setMessage("Tidak dapat terhubung ke server.");
     } finally {
